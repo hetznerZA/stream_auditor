@@ -8,6 +8,13 @@ class StreamAuditor < SoarAuditorApi::AuditorAPI
     "standard_stream" => "stderr"
   }
 
+  MODE_VALIDATORS = {
+    "io" => ->(v) { v.respond_to?(:<<) },
+    "path" => ->(v) { File.expand_path(v) rescue false },
+    "standard_stream" => ->(v) { ["stderr", "stdout"].include?(v) }
+  }
+  MODES = MODE_VALIDATORS.keys
+
   def initialize(configuration = nil)
     configuration = cleanup_configuration(configuration)
     super
@@ -29,10 +36,10 @@ class StreamAuditor < SoarAuditorApi::AuditorAPI
 
   def configuration_is_valid?(configuration)
     configuration = cleanup_configuration(configuration)
-    1 == configuration.keys.inject(0) { |count, key| count += 1 if ["standard_stream", "path", "io"].include?(key) } and
-      configuration["io"].nil? || configuration["io"].respond_to?(:<<) and
-      configuration["path"].nil? || (File.expand_path(configuration["path"]) rescue false) and
-      configuration["standard_stream"].nil? || ["stderr", "stdout"].include?(configuration["standard_stream"])
+
+    1 == configuration.keys.size and
+      1 == configuration.keys.count { |key| MODES.include?(key) } and
+      MODE_VALIDATORS.all? { |mode, validator| configuration[mode].nil? or validator.call(configuration[mode]) }
   end
 
   private
@@ -41,14 +48,14 @@ class StreamAuditor < SoarAuditorApi::AuditorAPI
   #
   # The auditor API:
   #
-  # * doesn't run the configure method for nil configuration,
-  # * insists on validation non-nil configuration, and
-  # * received the "adaptor" configuration key from the SOAR auditing provider.
+  # * doesn't run the configure method at all for nil configuration,
+  # * validates non-nil configuration, and
+  # * receives and passes through the "adaptor" configuration key from the SOAR auditing provider.
   #
   def cleanup_configuration(configuration)
     configuration = (configuration || {}).reject { |k, v| k == "adaptor" }
 
-    if configuration.nil? or configuration.empty?
+    if configuration.empty?
       DEFAULT_CONFIGURATION
     else
       configuration
