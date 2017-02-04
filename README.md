@@ -61,7 +61,7 @@ config = {
     "auditors" => {
       "local" => {
         "adaptor" => "StreamAuditor",
-        "standard_stream" => "stdout"
+        "stream" => "$stdout"
       }
     }
   }
@@ -82,7 +82,7 @@ config = {
     "auditors" => {
       "local" => {
         "adaptor" => "StreamAuditor",
-        "path" => "/var/log/application.log"
+        "stream" => "/var/log/application.log"
       }
     }
   }
@@ -103,7 +103,7 @@ config = {
     "auditors" => {
       "local" => {
         "adaptor" => "StreamAuditor",
-        "io" => File.open("/var/log/application.log", "a")
+        "stream" => File.open("/var/log/application.log", "a")
       }
     }
   }
