@@ -32,7 +32,7 @@ class StreamAuditor < SoarAuditorApi::AuditorAPI
 
   def creative_open_file(path)
     FileUtils.mkdir_p(File.expand_path("..", path), mode: 0700)
-    File.open(path, "a")
+    File.open(path, "a", 0600)
   end
 
   def stream

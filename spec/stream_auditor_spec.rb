@@ -101,6 +101,17 @@ describe StreamAuditor do
         subject.audit("Something happened")
         expect(File.read(path)).to eql "Something happened\n"
       end
+
+      it "should create the file with mode 0600" do
+        subject.audit("Something happened")
+        expect(File.stat(path).mode).to eql 0100600
+      end
+
+      it "should create parent directories with mode 0700" do
+        subject.audit("Something happened")
+        expect(File.stat(base).mode).to eql 040700
+      end
+
     end
   end
 
