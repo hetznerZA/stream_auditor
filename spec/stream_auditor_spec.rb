@@ -34,33 +34,33 @@ describe StreamAuditor do
     end
 
     it 'should accept a valid io configuration' do
-      expect(subject.configuration_is_valid?("io" => $stderr)).to eq(true)
+      expect(subject.configuration_is_valid?("stream" => $stderr)).to eq(true)
     end
 
     it 'should accept a valid standard stream configuration' do
-      expect(subject.configuration_is_valid?("standard_stream" => "stderr")).to eq(true)
+      expect(subject.configuration_is_valid?("stream" => "$stderr")).to eq(true)
     end
 
     it 'should accept a valid path configuration' do
-      expect(subject.configuration_is_valid?("path" => "/var/log/stream_auditor.log")).to eq(true)
+      expect(subject.configuration_is_valid?("stream" => "/var/log/stream_auditor.log")).to eq(true)
     end
 
     it 'should reject an invalid io configuration' do
-      expect(subject.configuration_is_valid?("io" => Object.new)).to eq(false)
+      expect(subject.configuration_is_valid?("stream" => Object.new)).to eq(false)
     end
 
     it 'should reject an invalid path configuration' do
-      expect(subject.configuration_is_valid?("path" => "\0")).to eq(false)
+      expect(subject.configuration_is_valid?("stream" => "\0")).to eq(false)
     end
 
     it 'should reject an invalid standard stream configuration' do
-      expect(subject.configuration_is_valid?("standard_stream" => "stdweird")).to eq(false)
+      expect(subject.configuration_is_valid?("stream" => "$stdweird")).to eq(false)
     end
   end
 
   context "when configured to audit to an IO object" do
     let(:stream) { StreamSpy.new }
-    subject { StreamAuditor.new("io" => stream) }
+    subject { StreamAuditor.new("stream" => stream) }
 
     it "should submit audit to the stream with data received" do
       subject.audit("Something happened")
@@ -76,7 +76,7 @@ describe StreamAuditor do
   context "when configured to audit to a file path" do
     let(:base) { Tempfile.open('stream_auditor_spec') { |io| io.path }.tap { |p| File.unlink(p) } }
     let(:path) { base }
-    subject { StreamAuditor.new("path" => path) }
+    subject { StreamAuditor.new("stream" => path) }
 
     after(:each) do
       FileUtils.rm_rf(base)
@@ -101,6 +101,32 @@ describe StreamAuditor do
         subject.audit("Something happened")
         expect(File.read(path)).to eql "Something happened\n"
       end
+    end
+  end
+
+  context "when configured to audit to the standard error stream" do
+    subject { StreamAuditor.new("stream" => "$stderr") }
+
+    it "should submit audit to the standard error stream with data received" do
+      expect { subject.audit("Something happened") }.to output("Something happened\n").to_stderr
+    end
+
+    it "should raise StandardError if a write error occurs" do
+      $stderr.close
+      expect { subject.audit("Something happened") }.to raise_error(StandardError, /closed stream/)
+    end
+  end
+
+  context "when configured to audit to the standard output stream" do
+    subject { StreamAuditor.new("stream" => "$stdout") }
+
+    it "should submit audit to the standard output stream with data received" do
+      expect { subject.audit("Something happened") }.to output("Something happened\n").to_stdout
+    end
+
+    it "should raise StandardError if a write error occurs" do
+      pending "Can't close stdout without disrupting rspec's output"
+      expect { subject.audit("Something happened") }.to raise_error(StandardError, /closed stream/)
     end
   end
 
