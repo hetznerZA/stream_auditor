@@ -7,10 +7,10 @@ require "fileutils"
 #
 # This implementation supports auditing to:
 #
-#   * an already open {IO} object (or anything that implements {IO#<<} and {IO#flush},
-#   * the standard error stream (+$stderr+),
-#   * the standard output stream (+$stdout+), or
-#   * a file.
+# * an already open {IO} object (or anything that implements +IO#<<+ and +IO#flush+),
+# * the standard error stream ($stderr),
+# * the standard output stream ($stdout), or
+# * a file.
 #
 # Developers should not need to work directly with this class. Instead, they should configure it through the
 # {http://www.rubydoc.info/gems/soar_auditing_provider/SoarAuditingProvider/AuditingProvider SOAR auditing provider}.
@@ -50,7 +50,7 @@ class StreamAuditor < SoarAuditorApi::AuditorAPI
   # The stream is immediately flushed after the data is written.
   #
   # @param [Object] data
-  #   the {String} (or {Object} with +to_s+ method) to write.
+  #   the +String+ (or +Object+ with +to_s+ method) to write.
   #   If the string is not newline-terminated, a newline is added.
   #
   def audit(data)
@@ -59,7 +59,7 @@ class StreamAuditor < SoarAuditorApi::AuditorAPI
   end
 
   ##
-  # Apply the configuration supplied to {#initialize}
+  # Apply the configuration supplied to {http://www.rubydoc.info/gems/soar_auditor_api/SoarAuditorApi/AuditorAPI#initialize-instance_method initialize}
   #
   # @param [Hash] configuration
   #   This method accepts +nil+ or a {Hash}, but the auditor API only calls
@@ -69,7 +69,8 @@ class StreamAuditor < SoarAuditorApi::AuditorAPI
   #
   #   * +adaptor+ - ignored (for compatibility with the SOAR auditing provider
   #   * +stream+  - the stream to audit to, one of:
-  #     * an {IO} object (or anything that implements {IO#<<} and {IO#flush}
+  #
+  #     * an {IO} object (or anything that implements +IO#<<+ and +IO#flush+)
   #     * the string +$stderr+ for the standard error stream
   #     * the string +$stdout+ for the standard output stream
   #     * the string path to a file
@@ -102,6 +103,8 @@ class StreamAuditor < SoarAuditorApi::AuditorAPI
   #
   # @return [true] if the configuration is valid
   # @return [false] if the configuration is invalid
+  #
+  # @see #configure
   #
   def configuration_is_valid?(configuration)
     return false unless (configuration.keys - ["adaptor", "stream"]).empty?
