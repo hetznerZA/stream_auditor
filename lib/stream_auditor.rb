@@ -4,65 +4,48 @@ require "fileutils"
 
 class StreamAuditor < SoarAuditorApi::AuditorAPI
 
-  DEFAULT_CONFIGURATION = {
-    "standard_stream" => "stderr"
+  MODES = {
+    "io" => {
+      validator: ->(v) { v.respond_to?(:<<) },
+      constructor: ->(v) { v },
+    },
+    "path" => {
+      validator: ->(v) { File.expand_path(v) rescue false },
+      constructor: ->(v) { creative_open(v) },
+    },
+    "standard_stream" => {
+      validator: ->(v) { ["stderr", "stdout"].include?(v) },
+      constructor: ->(v) { standard_stream(v) },
+    }
   }
 
-  MODE_VALIDATORS = {
-    "io" => ->(v) { v.respond_to?(:<<) },
-    "path" => ->(v) { File.expand_path(v) rescue false },
-    "standard_stream" => ->(v) { ["stderr", "stdout"].include?(v) }
-  }
-  MODES = MODE_VALIDATORS.keys
-
-  def initialize(configuration = nil)
-    configuration = cleanup_configuration(configuration)
-    super
-  end
+  MODE_VALIDATORS = MODES.inject({}) { |modes, (mode, config)| modes.tap { |m| m[mode] = config[:validator] } }
+  VALID_CONFIGURATION_KEYS = MODES.keys + ["adaptor"]
 
   def audit(data)
-    @stream << data.to_s.chomp + "\n"
-    @stream.flush
+    stream << data.to_s.chomp + "\n"
+    stream.flush
   end
 
   def configure(configuration = nil)
-    configuration = cleanup_configuration(configuration)
     super
-    @stream = nil
-    @stream = configuration["io"] if configuration["io"]
-    @stream = standard_stream(configuration["standard_stream"]) if configuration["standard_stream"]
-    @stream = creative_open_file(configuration["path"]) if configuration["path"]
+    @stream = if configuration["io"]
+                configuration["io"]
+              elsif configuration["standard_stream"]
+                standard_stream(configuration["standard_stream"])
+              elsif configuration["path"]
+                creative_open_file(configuration["path"])
+              end
   end
 
   def configuration_is_valid?(configuration)
-    configuration = cleanup_configuration(configuration)
-
-    1 == configuration.keys.size and
-      1 == configuration.keys.count { |key| MODES.include?(key) } and
+    configuration.keys.all? { |key| VALID_CONFIGURATION_KEYS.include?(key) } and
       MODE_VALIDATORS.all? { |mode, validator| configuration[mode].nil? or validator.call(configuration[mode]) }
   end
 
   private
 
-  # XXX Fight the auditor API
-  #
-  # The auditor API:
-  #
-  # * doesn't run the configure method at all for nil configuration,
-  # * validates non-nil configuration, and
-  # * receives and passes through the "adaptor" configuration key from the SOAR auditing provider.
-  #
-  def cleanup_configuration(configuration)
-    configuration = (configuration || {}).reject { |k, v| k == "adaptor" }
-
-    if configuration.empty?
-      DEFAULT_CONFIGURATION
-    else
-      configuration
-    end
-  end
-
-  # XXX Fight rspec
+  # Used to defer reference to standard streams until after instantiation
   #
   # From the rspec-expectations documentation:
   #
@@ -84,6 +67,10 @@ class StreamAuditor < SoarAuditorApi::AuditorAPI
   def creative_open_file(path)
     FileUtils.mkdir_p(File.expand_path("..", path), mode: 0700)
     File.open(path, "a")
+  end
+
+  def stream
+    @stream || $stderr
   end
 
 end
