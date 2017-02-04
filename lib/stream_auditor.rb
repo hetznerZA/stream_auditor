@@ -2,13 +2,86 @@ require "stream_auditor/version"
 require "soar_auditor_api/auditor_api"
 require "fileutils"
 
+##
+# An IO stream (or file) implementation of {http://www.rubydoc.info/gems/soar_auditor_api/SoarAuditorApi/AuditorAPI SoarAuditorApi::AuditorAPI}
+#
+# This implementation supports auditing to:
+#
+#   * an already open {IO} object (or anything that implements {IO#<<} and {IO#flush},
+#   * the standard error stream (+$stderr+),
+#   * the standard output stream (+$stdout+), or
+#   * a file.
+#
+# Developers should not need to work directly with this class. Instead, they should configure it through the
+# {http://www.rubydoc.info/gems/soar_auditing_provider/SoarAuditingProvider/AuditingProvider SOAR auditing provider}.
+#
+# @example Log to file
+#
+#  require "soar_auditing_provider"
+#  require "stream_auditor"
+#
+#  config = {
+#    "auditing" => {
+#      "provider" => "SoarAuditingProvider::AuditingProvider",
+#      "level" => "debug",
+#      "install_exit_handler" => "true",
+#      "direct_auditor_call" => "true",
+#      "queue_worker" => {
+#        "queue_size" => 1,
+#        "back_off_attempts" => 1
+#      },
+#      "auditors" => {
+#        "local" => {
+#          "adaptor" => "StreamAuditor",
+#          "stream" => "/var/log/application.log"
+#        }
+#      }
+#    }
+#  }
+#
+#  auditor = SoarAuditingProvider::AuditingProvider.new(config["auditing"])
+#  auditor.info("Auditor initialized")
+#
 class StreamAuditor < SoarAuditorApi::AuditorAPI
 
+  ##
+  # Write data to the configured stream
+  #
+  # The stream is immediately flushed after the data is written.
+  #
+  # @param [Object] data
+  #   the {String} (or {Object} with +to_s+ method) to write.
+  #   If the string is not newline-terminated, a newline is added.
+  #
   def audit(data)
     stream << data.to_s.chomp + "\n"
     stream.flush
   end
 
+  ##
+  # Apply the configuration supplied to {#initialize}
+  #
+  # @param [Hash] configuration
+  #   This method accepts +nil+ or a {Hash}, but the auditor API only calls
+  #   this method when the configuration is not +nil+.
+  #
+  #   The configuration may contain the following {String} keys:
+  #
+  #   * +adaptor+ - ignored (for compatibility with the SOAR auditing provider
+  #   * +stream+  - the stream to audit to, one of:
+  #     * an {IO} object (or anything that implements {IO#<<} and {IO#flush}
+  #     * the string +$stderr+ for the standard error stream
+  #     * the string +$stdout+ for the standard output stream
+  #     * the string path to a file
+  #
+  #   If the +stream+ key is ommitted, the default is +$stderr+.
+  #
+  #   When the stream is the path to a file:
+  #
+  #   * any missing intermediate directories will be created (mode 0700),
+  #   * the file will be created if missing (mode 0600),
+  #   * the file is opened in append mode.
+  #
   def configure(configuration = nil)
     super
     if configuration
@@ -21,6 +94,15 @@ class StreamAuditor < SoarAuditorApi::AuditorAPI
     end
   end
 
+  ##
+  # Validates the configuration
+  #
+  # @param [Hash] configuration
+  #   the configuration to validate
+  #
+  # @return [true] if the configuration is valid
+  # @return [false] if the configuration is invalid
+  #
   def configuration_is_valid?(configuration)
     return false unless (configuration.keys - ["adaptor", "stream"]).empty?
 
