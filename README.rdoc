@@ -1,0 +1,87 @@
+= StreamAuditor
+
+This is an IO stream auditor for the {http://www.rubydoc.info/gems/soar_auditing_provider SOAR Auditing Provider}.
+It implements the {http://www.rubydoc.info/gems/soar_auditor_api SOAR Auditor API}.
+
+It supports auditing to the standard error and output streams, to a file path (in append mode) or to an already open IO object.
+In all cases, the stream is flushed on every audit call.
+
+The implementation is provided by the class {StreamAuditor}.
+
+The implementation is covered by an rspec test suite in the {https://github.com/hetznerZA/stream_auditor StreamAuditor repo}.
+The suite includes and integration test the verifies that the auditor works with the SOAR Auditing Provider.
+
+== Usage
+
+For users of {https://gitlab.host-h.net/hetznerZA/soar_sc soar_sc}, instantiation of the SOAR Auditing Provider is
+purely a matter of configuration.
+
+For others, the provider can be configured to use the StreamAuditor as follows:
+
+  require "soar_auditing_provider"
+  require "stream_auditor"
+
+  # Log to stderr
+  config = {
+    "auditing" => {
+      "provider" => "SoarAuditingProvider::AuditingProvider",
+      "direct_auditor_call" => "true",
+      "auditors" => {
+        "local" => {
+          "adaptor" => "StreamAuditor"
+        }
+      }
+    }
+  }
+  auditor = SoarAuditingProvider::AuditingProvider.new(config["auditing"])
+  auditor.info("Something happened")
+
+  # Log to stdout
+  config = {
+    "auditing" => {
+      "provider" => "SoarAuditingProvider::AuditingProvider",
+      "direct_auditor_call" => "true",
+      "auditors" => {
+        "local" => {
+          "adaptor" => "StreamAuditor",
+          "stream" => "$stdout"
+        }
+      }
+    }
+  }
+  auditor = SoarAuditingProvider::AuditingProvider.new(config["auditing"])
+  auditor.info("Something happened")
+
+  # Log to file in append mode
+  config = {
+    "auditing" => {
+      "provider" => "SoarAuditingProvider::AuditingProvider",
+      "direct_auditor_call" => "true",
+      "auditors" => {
+        "local" => {
+          "adaptor" => "StreamAuditor",
+          "stream" => "/var/log/application.log"
+        }
+      }
+    }
+  }
+  auditor = SoarAuditingProvider::AuditingProvider.new(config["auditing"])
+  auditor.info("Something happened")
+
+  # Log to IO object
+  config = {
+    "auditing" => {
+      "provider" => "SoarAuditingProvider::AuditingProvider",
+      "level" => "debug",
+      "direct_auditor_call" => "true",
+      "auditors" => {
+        "local" => {
+          "adaptor" => "StreamAuditor",
+          "stream" => File.open("/var/log/application.log", "a")
+        }
+      }
+    }
+  }
+  auditor = SoarAuditingProvider::AuditingProvider.new(config["auditing"])
+  auditor.info("Something happened")
+

@@ -7,7 +7,7 @@ require "fileutils"
 #
 # This implementation supports auditing to:
 #
-# * an already open {IO} object (or anything that implements +IO#<<+ and +IO#flush+),
+# * an already open +IO+ object (or anything that implements +IO#<<+ and +IO#flush+),
 # * the standard error stream ($stderr),
 # * the standard output stream ($stdout), or
 # * a file.
@@ -57,15 +57,15 @@ class StreamAuditor < SoarAuditorApi::AuditorAPI
   # Apply the configuration supplied to {http://www.rubydoc.info/gems/soar_auditor_api/SoarAuditorApi/AuditorAPI#initialize-instance_method initialize}
   #
   # @param [Hash] configuration
-  #   This method accepts +nil+ or a {Hash}, but the auditor API only calls
+  #   This method accepts +nil+ or a +Hash+, but the auditor API only calls
   #   this method when the configuration is not +nil+.
   #
-  #   The configuration may contain the following {String} keys:
+  #   The configuration may contain the following +String+ keys:
   #
   #   * +adaptor+ - ignored (for compatibility with the SOAR auditing provider
   #   * +stream+  - the stream to audit to, one of:
   #
-  #     * an {IO} object (or anything that implements +IO#<<+ and +IO#flush+)
+  #     * an +IO+ object (or anything that implements +IO#<<+ and +IO#flush+)
   #     * the string +$stderr+ for the standard error stream
   #     * the string +$stdout+ for the standard output stream
   #     * the string path to a file
