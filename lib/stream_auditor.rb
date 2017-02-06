@@ -24,12 +24,7 @@ require "fileutils"
 #    "auditing" => {
 #      "provider" => "SoarAuditingProvider::AuditingProvider",
 #      "level" => "debug",
-#      "install_exit_handler" => "true",
 #      "direct_auditor_call" => "true",
-#      "queue_worker" => {
-#        "queue_size" => 1,
-#        "back_off_attempts" => 1
-#      },
 #      "auditors" => {
 #        "local" => {
 #          "adaptor" => "StreamAuditor",

@@ -10,13 +10,8 @@ describe StreamAuditor do
     config = {
       "auditing" => {
         "provider" => "SoarAuditingProvider::AuditingProvider",
-        "level" => "debug",
         "install_exit_handler" => "false", # Writes to stderr after rspec closes it.
-        "direct_auditor_call" => "true",   # Should obviate queue worker, but currently doesn't.
-        "queue_worker" => {                # Minimal queue worker config to pass validation.
-          "queue_size" => 1,
-          "back_off_attempts" => 1
-        },
+        "direct_auditor_call" => "true",
         "auditors" => {
           "local" => {
             "adaptor" => "StreamAuditor"

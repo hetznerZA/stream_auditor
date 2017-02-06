@@ -23,21 +23,15 @@ Or install it yourself as:
 
 ## Usage
 
-Configuration of the SOAR auditing provider is still chunky. The `queue_worker` config is not required for the stream auditor, but
-the auditing provider insists on it. So for now:
+Until the [SOAR Auditing Provider](https://github.com/hetznerZA/soar_auditing_provider) is extended to ask auditors if they
+support direct calls (as opposed to enqueued calls via queue worker thread):
 
 ```ruby
 # Log to stderr
 config = {
   "auditing" => {
     "provider" => "SoarAuditingProvider::AuditingProvider",
-    "level" => "debug",
-    "install_exit_handler" => "true",
     "direct_auditor_call" => "true",
-    "queue_worker" => {
-      "queue_size" => 1,
-      "back_off_attempts" => 1
-    },
     "auditors" => {
       "local" => {
         "adaptor" => "StreamAuditor"
@@ -45,19 +39,14 @@ config = {
     }
   }
 }
-SoarAuditingProvider::AuditingProvider.new(config["auditing"])
+auditor = SoarAuditingProvider::AuditingProvider.new(config["auditing"])
+auditor.info("Something happened")
 
 # Log to stdout
 config = {
   "auditing" => {
     "provider" => "SoarAuditingProvider::AuditingProvider",
-    "level" => "debug",
-    "install_exit_handler" => "true",
     "direct_auditor_call" => "true",
-    "queue_worker" => {
-      "queue_size" => 1,
-      "back_off_attempts" => 1
-    },
     "auditors" => {
       "local" => {
         "adaptor" => "StreamAuditor",
@@ -66,19 +55,14 @@ config = {
     }
   }
 }
-SoarAuditingProvider::AuditingProvider.new(config["auditing"])
+auditor = SoarAuditingProvider::AuditingProvider.new(config["auditing"])
+auditor.info("Something happened")
 
 # Log to file in append mode
 config = {
   "auditing" => {
     "provider" => "SoarAuditingProvider::AuditingProvider",
-    "level" => "debug",
-    "install_exit_handler" => "true",
     "direct_auditor_call" => "true",
-    "queue_worker" => {
-      "queue_size" => 1,
-      "back_off_attempts" => 1
-    },
     "auditors" => {
       "local" => {
         "adaptor" => "StreamAuditor",
@@ -87,19 +71,15 @@ config = {
     }
   }
 }
-SoarAuditingProvider::AuditingProvider.new(config["auditing"])
+auditor = SoarAuditingProvider::AuditingProvider.new(config["auditing"])
+auditor.info("Something happened")
 
 # Log to IO object
 config = {
   "auditing" => {
     "provider" => "SoarAuditingProvider::AuditingProvider",
     "level" => "debug",
-    "install_exit_handler" => "true",
     "direct_auditor_call" => "true",
-    "queue_worker" => {
-      "queue_size" => 1,
-      "back_off_attempts" => 1
-    },
     "auditors" => {
       "local" => {
         "adaptor" => "StreamAuditor",
@@ -108,7 +88,8 @@ config = {
     }
   }
 }
-SoarAuditingProvider::AuditingProvider.new(config["auditing"])
+auditor = SoarAuditingProvider::AuditingProvider.new(config["auditing"])
+auditor.info("Something happened")
 ```
 
 ## Development
