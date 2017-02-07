@@ -108,6 +108,15 @@ class StreamAuditor < SoarAuditorApi::AuditorAPI
     want_default_stream?(s) or want_stderr_stream?(s) or want_stdout_stream?(s) or want_io_stream?(s) or want_path_stream?(s)
   end
 
+  ##
+  # Hint direct auditor call preference to SOAR Auditor API
+  #
+  # @return [true] always
+  #
+  def prefer_direct_call?
+    true
+  end
+
   private
 
   def creative_open_file(path)

@@ -23,5 +23,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "soar_auditing_provider", "~> 1.8"
 
-  spec.add_dependency "soar_auditor_api", "~> 0.0"
+  spec.add_dependency "soar_auditor_api", "~> 1.0"
 end
