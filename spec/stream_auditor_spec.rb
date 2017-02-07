@@ -22,6 +22,10 @@ describe StreamAuditor do
     it 'has a method configuration_is_valid?' do
       expect(subject.respond_to?('configuration_is_valid?')).to eq(true)
     end
+
+    it 'has a method prefer_direct_call?' do
+      expect(subject.respond_to?('prefer_direct_call?')).to eq(true)
+    end
   end
 
   context "when configured by AuditorAPI" do
