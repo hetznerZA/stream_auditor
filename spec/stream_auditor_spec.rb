@@ -37,6 +37,10 @@ describe StreamAuditor do
       expect(subject.configuration_is_valid?("adaptor" => "AnyClassName")).to eq(true)
     end
 
+    it 'should cope with being passed nfrs' do
+      expect(subject.configuration_is_valid?("nfrs" => {"property" => "requirement"})).to eq(true)
+    end
+
     it 'should accept a valid io configuration' do
       expect(subject.configuration_is_valid?("stream" => $stderr)).to eq(true)
     end

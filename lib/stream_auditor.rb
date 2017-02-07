@@ -102,7 +102,7 @@ class StreamAuditor < SoarAuditorApi::AuditorAPI
   # @see #configure
   #
   def configuration_is_valid?(configuration)
-    return false unless (configuration.keys - ["adaptor", "stream"]).empty?
+    return false unless (configuration.keys - ["adaptor", "nfrs", "stream"]).empty?
 
     s = configuration["stream"]
     want_default_stream?(s) or want_stderr_stream?(s) or want_stdout_stream?(s) or want_io_stream?(s) or want_path_stream?(s)
