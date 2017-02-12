@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'stream_auditor/version'
+require 'stream_auditor_version'
 
 Gem::Specification.new do |spec|
   spec.name          = "stream_auditor"
-  spec.version       = StreamAuditor::VERSION
+  spec.version       = StreamAuditorVersion::VERSION
   spec.authors       = ["Sheldon Hearn"]
   spec.email         = ["sheldonh@starjuice.net"]
 

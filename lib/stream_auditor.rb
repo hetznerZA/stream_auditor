@@ -1,4 +1,4 @@
-require "stream_auditor/version"
+require "stream_auditor_version"
 require "soar_auditor_api/auditor_api"
 require "fileutils"
 
@@ -38,6 +38,8 @@ require "fileutils"
 #  auditor.info("Auditor initialized")
 #
 class StreamAuditor < SoarAuditorApi::AuditorAPI
+
+  include StreamAuditorVersion
 
   ##
   # Write data to the configured stream
