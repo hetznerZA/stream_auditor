@@ -1,3 +1,5 @@
+[![Gem Version](https://badge.fury.io/rb/stream_auditor.svg)]((http://badge.fury.io/rb/stream_auditor) [![Build Status](https://travis-ci.org/hetznerZA/stream_auditor.svg?branch=master)](https://travis-ci.org/hetznerZA/stream_auditor) [![Dependency Status](https://gemnasium.com/hetznerZA/stream_auditor.svg)](https://gemnasium.com/hetznerZA/stream_auditor)
+
 # StreamAuditor
 
 This is an IO stream auditor for the [SOAR Auditing Provider](https://github.com/hetznerZA/soar_auditing_provider).
