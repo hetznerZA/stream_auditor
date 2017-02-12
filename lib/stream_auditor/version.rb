@@ -1,5 +1,5 @@
-require "soar_auditor_api/auditor_api"
+require "stream_auditor"
 
-class StreamAuditor < SoarAuditorApi::AuditorAPI
+class StreamAuditor
   VERSION = "1.2.1"
 end
